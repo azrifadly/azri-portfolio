@@ -8,7 +8,7 @@ export function Journey() {
     <section id="journey" className="border-y border-border bg-card">
       <div className="mx-auto max-w-[760px] px-6 py-24">
         <Reveal>
-          <h2 className="mb-12 font-display text-[clamp(26px,3.2vw,34px)] font-bold tracking-[-0.02em]">
+          <h2 className="mb-12 font-display text-[clamp(26px,3.2vw,34px)] font-extrabold tracking-[-0.02em]">
             Journey
           </h2>
         </Reveal>
@@ -32,7 +32,7 @@ export function Journey() {
                     className={cn(
                       "text-base",
                       building
-                        ? "font-semibold text-foreground"
+                        ? "font-bold text-foreground"
                         : "text-muted-foreground"
                     )}
                   >

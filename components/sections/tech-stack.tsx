@@ -5,7 +5,7 @@ export function TechStack() {
   return (
     <section className="mx-auto max-w-[1120px] px-6 py-24">
       <Reveal>
-        <h2 className="mb-12 font-display text-[clamp(26px,3.2vw,34px)] font-bold tracking-[-0.02em]">
+        <h2 className="mb-12 font-display text-[clamp(26px,3.2vw,34px)] font-extrabold tracking-[-0.02em]">
           Tech stack
         </h2>
       </Reveal>

@@ -8,7 +8,7 @@ export function Services() {
     <section id="services" className="border-y border-border bg-card">
       <div className="mx-auto max-w-[1120px] px-6 py-24">
         <Reveal>
-          <h2 className="mb-11 text-center font-display text-[clamp(26px,3.2vw,34px)] font-bold tracking-[-0.02em]">
+          <h2 className="mb-11 text-center font-display text-[clamp(26px,3.2vw,34px)] font-extrabold tracking-[-0.02em]">
             Need something custom?
           </h2>
         </Reveal>
@@ -16,7 +16,7 @@ export function Services() {
           {services.map((service) => (
             <Reveal key={service.title} className="h-full">
               <div className="h-full rounded-3xl border border-border p-7">
-                <h3 className="mb-2.5 font-display text-[17px] font-semibold">
+                <h3 className="mb-2.5 font-display text-[17px] font-extrabold">
                   {service.title}
                 </h3>
                 <p className="text-sm leading-[1.65] text-muted-foreground">

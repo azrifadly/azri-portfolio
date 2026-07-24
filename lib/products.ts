@@ -5,7 +5,7 @@
  * To add product #21: append one object here. No component changes needed.
  */
 
-export type ProductStatus = "live" | "building" | "soon";
+export type ProductStatus = "live" | "building" | "soon" | "decommissioned";
 
 export interface CaseStudySection {
   heading: string;
@@ -34,136 +34,77 @@ export interface Product {
 
 export const products: Product[] = [
   {
-    slug: "kaswatch",
-    title: "KasWatch",
+    slug: "tradelogio",
+    title: "Tradelogio",
     description:
-      "Telegram monitoring bot for Kaspa nodes. Real-time alerts when a node goes down, so you find out before your validators do.",
-    status: "live",
-    tag: "Bot / infra",
-    iconLetter: "K",
-    caseStudy: {
-      headline: "Telegram monitoring for Kaspa nodes.",
-      sections: [
-        {
-          heading: "The problem",
-          body: [
-            "Running a Kaspa node means caring about uptime, but most operators find out a node is down the slow way: someone notices, or a dashboard gets checked hours later. There was no lightweight way to get pinged the moment a node stopped responding.",
-          ],
-        },
-        {
-          heading: "How it works",
-          body: [
-            "KasWatch polls each registered node on a short interval and tracks its sync state and responsiveness. When a node stops responding or falls out of sync, it sends a Telegram alert to the operator within seconds — and a follow-up when the node recovers.",
-            "Setup is a conversation with the bot: add a node address, get alerts. No dashboard to host, no agent to install on the node.",
-          ],
-        },
-        {
-          heading: "Status",
-          body: [
-            "Live and monitoring nodes today. Alerting and recovery notifications are stable; next up is configurable check intervals and richer node health metrics.",
-          ],
-        },
-      ],
-      stack: ["Node.js", "Telegram Bot API", "PostgreSQL", "Docker"],
-    },
-  },
-  {
-    slug: "ticketpilot",
-    title: "TicketPilot",
-    description:
-      "AI assistant that collects missing information before creating IT access request tickets, cutting back-and-forth for support teams.",
-    status: "building",
-    tag: "IAM / AI agent",
+      "A trading journal SaaS with a calendar-based journal, trade folders and live crypto and forex market data. Built and shipped as a freemium product, since shelved.",
+    status: "decommissioned",
+    tag: "Trading / SaaS",
     iconLetter: "T",
     caseStudy: {
-      headline: "Complete tickets before they reach the queue.",
+      headline: "A freemium trading journal, built solo.",
       sections: [
         {
           heading: "The problem",
           body: [
-            "Most IT access request tickets arrive incomplete: no approver named, no system specified, no justification. Support teams spend the first round of every ticket asking for the information the form should have collected. I see this every day working in IAM.",
+            "Traders keep their records in scattered spreadsheets, which makes it hard to see what's actually working across dozens of trades. Tradelogio set out to make logging trades effortless and reviewing them a habit rather than a chore.",
+          ],
+        },
+        {
+          heading: "How it worked",
+          body: [
+            "A journal page organised trades into folders with a calendar view, so a month of activity was visible at a glance. A markets page pulled live crypto and forex prices, charted with Lightweight Charts, alongside the journal. Auth, data and storage ran on Supabase, with Resend handling transactional email and a waitlist.",
+            "The product shipped on a freemium model — a free tier capped at 50 trades and a $19/month Pro tier — behind a dark, brutalist interface with green accents.",
+          ],
+        },
+        {
+          heading: "Why it was decommissioned",
+          body: [
+            "Tradelogio was my main build focus for an extended stretch, but was deprioritised under time constraints with the dashboard still unfinished. I moved on to other priorities and stopped maintaining it — though the build taught me a lot. If it's ever resumed, the first job is consolidating the crypto and forex charts into a single Lightweight Charts wrapper for a consistent look across the platform.",
+          ],
+        },
+      ],
+      stack: [
+        "Next.js",
+        "Supabase",
+        "Tailwind CSS",
+        "Lightweight Charts",
+        "Resend",
+      ],
+    },
+  },
+  {
+    slug: "flymehere",
+    title: "FlyMeHere",
+    description:
+      "AI flight search for Southeast Asia. Describe your trip in plain language and Claude extracts the intent, then it searches every airline — including the regional carriers with the cheapest fares.",
+    status: "building",
+    tag: "Travel / AI search",
+    iconLetter: "F",
+    caseStudy: {
+      headline: "Tell us where you want to go — we find the cheapest way there.",
+      sections: [
+        {
+          heading: "The problem",
+          body: [
+            "Finding cheap flights in Southeast Asia means filling in rigid search forms and still missing the regional budget carriers that often have the best deals. Mainstream search engines under-index the region, so the cheapest option is frequently the one you never see.",
           ],
         },
         {
           heading: "How it works",
           body: [
-            "TicketPilot sits in front of the ticketing system. It asks the requester follow-up questions in plain language until the request has everything the fulfilment team needs — the right system, the right access level, the right approver — then creates a ticket that can be actioned on first touch.",
+            "Instead of a form, you describe the trip — \"Bali next month with my family on a budget\" — and Claude (Haiku 4.5) extracts the travel intent: destination, origin, dates and flexibility, travellers, budget tier and trip type. Each field carries a confidence score, so the search degrades gracefully when something can't be pulled from the sentence.",
+            "That structured intent then drives a search across airlines, with the regional carriers mainstream engines miss included, focused on Southeast Asia for faster, better-informed results.",
           ],
         },
         {
           heading: "Status",
           body: [
-            "In development. The conversation flow and ticket creation are working; current focus is integrating with common ticketing systems and hardening the validation rules.",
+            "In active development, and the product I'm building right now. The landing page is live and natural-language intent extraction is working; the next phase is wiring in live flight-search APIs (Skyscanner, Amadeus).",
           ],
         },
       ],
-      stack: ["Next.js", "Claude API", "PostgreSQL", "Supabase"],
-    },
-  },
-  {
-    slug: "invoiceai",
-    title: "InvoiceAI",
-    description:
-      "Extracts line items, totals and vendor details from invoices using OCR and AI, and exports clean, structured data.",
-    status: "soon",
-    tag: "OCR / automation",
-    iconLetter: "I",
-    caseStudy: {
-      headline: "Invoices in, structured data out.",
-      sections: [
-        {
-          heading: "The problem",
-          body: [
-            "Small teams still key invoice data into spreadsheets and accounting tools by hand. Generic OCR gets the text but not the structure — line items, totals and vendor details still need a human to sort out.",
-          ],
-        },
-        {
-          heading: "The plan",
-          body: [
-            "InvoiceAI combines OCR with a language model that understands invoice layout: it extracts line items, totals, tax and vendor details into a consistent schema, flags anything it isn't confident about, and exports clean CSV or pushes straight to your accounting tool.",
-          ],
-        },
-        {
-          heading: "Status",
-          body: [
-            "Coming soon. Extraction pipeline is being prototyped now.",
-          ],
-        },
-      ],
-      stack: ["Next.js", "OpenAI API", "OCR", "Supabase"],
-    },
-  },
-  {
-    slug: "resumeai",
-    title: "ResumeAI",
-    description:
-      "Generates ATS-friendly resumes from a plain work history, tuned to match the language of a specific job description.",
-    status: "soon",
-    tag: "Career tooling",
-    iconLetter: "R",
-    caseStudy: {
-      headline: "Your work history, matched to the job in front of you.",
-      sections: [
-        {
-          heading: "The problem",
-          body: [
-            "Tailoring a resume to every job posting is tedious, so most people don't — and ATS filters reject resumes that never mention the words the posting uses, even when the experience matches.",
-          ],
-        },
-        {
-          heading: "The plan",
-          body: [
-            "ResumeAI takes a plain-language work history once, then generates an ATS-friendly resume tuned to a specific job description: same facts, phrased in the language the posting actually uses. No invented experience — it rewords what you did, it doesn't embellish it.",
-          ],
-        },
-        {
-          heading: "Status",
-          body: [
-            "Coming soon. Currently in design.",
-          ],
-        },
-      ],
-      stack: ["Next.js", "Claude API", "Tailwind CSS", "Vercel"],
+      stack: ["Next.js", "Claude API", "Supabase", "Tailwind CSS"],
     },
   },
 ];

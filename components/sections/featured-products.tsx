@@ -8,13 +8,13 @@ export function FeaturedProducts() {
       <div className="mx-auto max-w-[1120px]">
         <Reveal className="mb-12">
           <p className="mb-3 font-mono text-[13px] font-medium tracking-[0.02em] text-brand">
-            FEATURED PRODUCTS
+            PRODUCTS
           </p>
-          <h2 className="max-w-[560px] font-display text-[clamp(28px,3.6vw,38px)] font-bold tracking-[-0.02em]">
-            Software I&apos;ve shipped, and software I&apos;m shipping next.
+          <h2 className="max-w-[560px] font-display text-[clamp(28px,3.6vw,38px)] font-extrabold tracking-[-0.02em]">
+            What I&apos;ve built, and what I&apos;m building next.
           </h2>
         </Reveal>
-        <div className="grid grid-cols-1 gap-5 min-[561px]:grid-cols-2 min-[861px]:grid-cols-4">
+        <div className="grid grid-cols-1 gap-5 min-[561px]:grid-cols-2">
           {products.map((product) => (
             <Reveal key={product.slug} className="h-full">
               <ProductCard product={product} />

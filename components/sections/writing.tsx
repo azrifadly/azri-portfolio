@@ -8,7 +8,7 @@ export function Writing() {
     <section id="blog" className="border-y border-border bg-card">
       <div className="mx-auto max-w-[1120px] px-6 py-24">
         <Reveal>
-          <h2 className="mb-12 font-display text-[clamp(26px,3.2vw,34px)] font-bold tracking-[-0.02em]">
+          <h2 className="mb-12 font-display text-[clamp(26px,3.2vw,34px)] font-extrabold tracking-[-0.02em]">
             Writing
           </h2>
         </Reveal>
@@ -24,7 +24,7 @@ export function Writing() {
                   <span className="font-mono text-[11px] font-medium tracking-[0.02em] text-brand">
                     {post.topic.toUpperCase()}
                   </span>
-                  <h3 className="mt-3 font-display text-base font-semibold leading-[1.4]">
+                  <h3 className="mt-3 font-display text-base font-extrabold leading-[1.4]">
                     {post.title}
                   </h3>
                 </div>

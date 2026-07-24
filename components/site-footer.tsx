@@ -5,7 +5,7 @@ export function SiteFooter() {
   return (
     <footer className="border-t border-border">
       <div className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-4 px-6 py-8">
-        <span className="font-display text-[15px] font-bold">{site.name}</span>
+        <span className="font-display text-[15px] font-extrabold">{site.name}</span>
         <nav className="flex gap-6">
           {footerLinks.map((link) => (
             <Link

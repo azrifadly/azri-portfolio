@@ -9,8 +9,8 @@ export function Hero() {
     <section className="mx-auto grid max-w-[1120px] grid-cols-1 items-center gap-14 px-6 pb-16 pt-[88px] min-[861px]:grid-cols-[1.15fr_0.85fr]">
       <div>
         <Reveal>
-          <h1 className="mb-6 font-display text-[clamp(36px,5vw,56px)] font-bold leading-[1.08] tracking-[-0.03em]">
-            Building AI software that saves businesses time.
+          <h1 className="mb-6 font-display text-[clamp(36px,5vw,56px)] font-extrabold leading-[1.08] tracking-[-0.03em]">
+            Repetitive workflows meet AI-powered fixes.
           </h1>
         </Reveal>
         <Reveal>

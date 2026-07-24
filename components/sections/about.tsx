@@ -21,7 +21,7 @@ export function About() {
           <p className="mb-3 font-mono text-[13px] font-medium tracking-[0.02em] text-brand">
             ABOUT
           </p>
-          <h2 className="mb-5 font-display text-[clamp(26px,3.2vw,34px)] font-bold tracking-[-0.02em]">
+          <h2 className="mb-5 font-display text-[clamp(26px,3.2vw,34px)] font-extrabold tracking-[-0.02em]">
             Hi, I&apos;m Azri.
           </h2>
           <p className="mb-4 text-base leading-[1.75] text-muted-foreground">
@@ -38,7 +38,7 @@ export function About() {
                 key={stat.label}
                 className="rounded-2xl border border-border px-3.5 py-[18px] text-center"
               >
-                <div className="mb-1 font-display text-2xl font-bold">
+                <div className="mb-1 font-display text-2xl font-extrabold">
                   {stat.value}
                 </div>
                 <div className="text-xs text-muted-foreground">

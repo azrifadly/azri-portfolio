@@ -43,12 +43,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
       <header className="mb-12">
         <div className="mb-6 flex items-start justify-between">
-          <div className="flex size-14 items-center justify-center rounded-2xl bg-brand-soft font-display text-xl font-bold text-brand">
+          <div className="flex size-14 items-center justify-center rounded-2xl bg-brand-soft font-display text-xl font-extrabold text-brand">
             {product.iconLetter}
           </div>
           <StatusDot status={product.status} />
         </div>
-        <h1 className="mb-3 font-display text-[clamp(32px,4.5vw,44px)] font-bold leading-[1.1] tracking-[-0.03em]">
+        <h1 className="mb-3 font-display text-[clamp(32px,4.5vw,44px)] font-extrabold leading-[1.1] tracking-[-0.03em]">
           {product.title}
         </h1>
         <p className="mb-4 text-lg leading-[1.6] text-muted-foreground">
@@ -62,7 +62,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <div className="space-y-10">
         {product.caseStudy.sections.map((section) => (
           <section key={section.heading}>
-            <h2 className="mb-3 font-display text-xl font-semibold tracking-[-0.01em]">
+            <h2 className="mb-3 font-display text-xl font-extrabold tracking-[-0.01em]">
               {section.heading}
             </h2>
             {section.body.map((paragraph) => (
@@ -77,7 +77,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         ))}
 
         <section>
-          <h2 className="mb-4 font-display text-xl font-semibold tracking-[-0.01em]">
+          <h2 className="mb-4 font-display text-xl font-extrabold tracking-[-0.01em]">
             Stack
           </h2>
           <div className="flex flex-wrap gap-2">

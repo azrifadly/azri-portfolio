@@ -38,7 +38,7 @@ export function Contact() {
       className="bg-[linear-gradient(160deg,#2A2A2E_0%,#1C1C1F_55%,#151517_100%)] px-6 py-28"
     >
       <Reveal className="mx-auto max-w-[1120px] text-center">
-        <h2 className="mb-5 font-display text-[clamp(30px,4.2vw,44px)] font-bold tracking-[-0.02em] text-[#FAFAFA]">
+        <h2 className="mb-5 font-display text-[clamp(30px,4.2vw,44px)] font-extrabold tracking-[-0.02em] text-[#FAFAFA]">
           Let&apos;s build something together.
         </h2>
         <p className="mb-10 text-base text-[#A8A8AD]">

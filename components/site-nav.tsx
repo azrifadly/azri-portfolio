@@ -26,7 +26,7 @@ export function SiteNav() {
       <div className="mx-auto flex max-w-[1120px] items-center justify-between px-6 py-[18px]">
         <Link
           href="/"
-          className="font-display text-[17px] font-bold tracking-[-0.01em] text-foreground"
+          className="font-display text-[17px] font-extrabold tracking-[-0.01em] text-foreground"
         >
           {site.name}
         </Link>

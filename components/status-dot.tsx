@@ -24,6 +24,11 @@ const STATUS_STYLES: Record<
     pill: "bg-[#F1F1EF] text-[#767672]",
     dot: "bg-[#9B9B96]",
   },
+  decommissioned: {
+    label: "Decommissioned",
+    pill: "bg-[#F3EDED] text-[#8A6A6A]",
+    dot: "bg-[#B48F8F]",
+  },
 };
 
 export function StatusDot({

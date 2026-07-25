@@ -1,9 +1,9 @@
 export const site = {
   name: "AzriFadli",
-  email: "hello@azri.dev",
+  email: "azrifadly@gmail.com",
   location: "Singapore",
-  github: "#",
-  linkedin: "#",
+  github: "https://github.com/azrifadly",
+  linkedin: "https://linkedin.com/in/azrifadli",
   /** Production origin — used for canonical + OpenGraph URLs. Update to your real domain. */
   url: "https://azri.dev",
 };

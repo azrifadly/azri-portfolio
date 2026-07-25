@@ -4,11 +4,13 @@ export const runtime = "nodejs";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CALL_MINUTES = 30;
+const MAX_MESSAGE = 180;
 
 interface BookBody {
   email?: string;
   date?: string;
   time?: string;
+  message?: string;
   tz?: string;
   startISO?: string;
 }
@@ -78,10 +80,17 @@ export async function POST(req: Request) {
   }
 
   const email = (body.email || "").trim().toLowerCase();
+  const message = (body.message || "").trim();
   const { date, time, tz, startISO } = body;
 
   if (!EMAIL_RE.test(email) || !date || !time || !startISO) {
     return NextResponse.json({ error: "Missing or invalid booking details." }, { status: 400 });
+  }
+  if (message.length > MAX_MESSAGE) {
+    return NextResponse.json(
+      { error: `Message must be ${MAX_MESSAGE} characters or fewer.` },
+      { status: 400 }
+    );
   }
 
   const start = new Date(startISO);
@@ -103,7 +112,9 @@ export async function POST(req: Request) {
     start,
     end,
     summary: `Discovery call with ${email}`,
-    description: `Discovery call booked via the website.\nVisitor: ${email}\nRequested slot: ${date} ${time} (${tz || "local"}).`,
+    description:
+      `Discovery call booked via the website.\nVisitor: ${email}\nRequested slot: ${date} ${time} (${tz || "local"}).` +
+      (message ? `\nMessage: ${message}` : ""),
   });
 
   const safeEmail = escapeHTML(email);
@@ -114,6 +125,7 @@ export async function POST(req: Request) {
       <p style="margin:0 0 6px"><strong>When:</strong> ${escapeHTML(whenLabel)} ${safeTz ? `(${safeTz})` : ""}</p>
       <p style="margin:0 0 6px"><strong>With:</strong> ${safeEmail}</p>
       <p style="margin:0 0 6px"><strong>Duration:</strong> ${CALL_MINUTES} min</p>
+      ${message ? `<p style="margin:0 0 6px"><strong>Message:</strong> ${escapeHTML(message)}</p>` : ""}
       <p style="margin:16px 0 0;color:#666">Open the attached <code>.ics</code> to add it to your calendar. Reply to this email to reach the visitor.</p>
     </div>`;
 

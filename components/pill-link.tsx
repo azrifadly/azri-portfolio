@@ -24,15 +24,21 @@ export function PillLink({
   variant = "primary",
   className,
   children,
+  target,
+  rel,
 }: {
   href: string;
   variant?: PillVariant;
   className?: string;
   children: ReactNode;
+  target?: string;
+  rel?: string;
 }) {
   return (
     <Link
       href={href}
+      target={target}
+      rel={rel ?? (target === "_blank" ? "noopener noreferrer" : undefined)}
       className={cn(
         "btn-scale inline-flex items-center gap-2 rounded-full px-[22px] py-[13px] text-[15px] font-medium",
         VARIANTS[variant],

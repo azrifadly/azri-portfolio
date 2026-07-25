@@ -17,6 +17,7 @@ const SLOTS = [
 ];
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_MESSAGE = 180;
 
 // --- Anti-spam: front-end guardrail, backed by localStorage ---
 const BOOKINGS_KEY = "discovery_bookings";
@@ -61,10 +62,36 @@ function prettyDate(dateStr: string) {
   });
 }
 
-/** A few slots look taken per day (deterministic), plus anything booked locally. */
-function bookedSlotsFor(dateStr: string, takenLocally: string[]): Set<string> {
+function daySeed(dateStr: string) {
   const d = new Date(dateStr);
-  const seed = d.getFullYear() * 372 + (d.getMonth() + 1) * 31 + d.getDate();
+  return d.getFullYear() * 372 + (d.getMonth() + 1) * 31 + d.getDate();
+}
+
+/**
+ * A handful of "fully booked" days — only in the current month so it looks like
+ * near-term demand rather than a permanent state, and weighted toward weekends.
+ */
+function isFullyBooked(dateStr: string, today: Date) {
+  const d = new Date(dateStr);
+  if (
+    d.getFullYear() !== today.getFullYear() ||
+    d.getMonth() !== today.getMonth()
+  ) {
+    return false;
+  }
+  const seed = daySeed(dateStr);
+  const weekend = d.getDay() === 0 || d.getDay() === 6;
+  return weekend ? seed % 2 === 0 : seed % 4 === 0;
+}
+
+/** A few slots look taken per day (deterministic), plus anything booked locally. */
+function bookedSlotsFor(
+  dateStr: string,
+  takenLocally: string[],
+  fullyBooked: boolean
+): Set<string> {
+  if (fullyBooked) return new Set(SLOTS);
+  const seed = daySeed(dateStr);
   const booked = new Set<string>();
   const n = 3 + (seed % 3); // 3–5 of 12 look taken
   for (let i = 0; i < n; i++) {
@@ -78,6 +105,7 @@ interface DayCell {
   day: number;
   key: string;
   disabled: boolean;
+  full: boolean;
 }
 
 export function BookCall() {
@@ -96,6 +124,7 @@ export function BookCall() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -106,9 +135,16 @@ export function BookCall() {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+  const calRef = useRef<HTMLDivElement>(null);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
   const keyboardNav = useRef(false);
 
   useEffect(() => setMounted(true), []);
+
+  const messageError =
+    message.length > MAX_MESSAGE
+      ? `Please keep your message under ${MAX_MESSAGE} characters.`
+      : null;
 
   const atCurrentMonth =
     view.getFullYear() === today.getFullYear() &&
@@ -124,13 +160,19 @@ export function BookCall() {
     for (let b = 0; b < startDay; b++) out.push(null);
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
-      const disabled = date < today; // past only — weekends stay open
       const key = iso(date);
-      if (!disabled && firstEnabled === null) firstEnabled = key;
-      out.push({ day, key, disabled });
+      const disabled = date < today; // past only — weekends stay open
+      const full = !disabled && isFullyBooked(key, today);
+      if (!disabled && !full && firstEnabled === null) firstEnabled = key;
+      out.push({ day, key, disabled, full });
     }
     return { cells: out, firstEnabledKey: firstEnabled };
   }, [view, today]);
+
+  const monthHasFull = useMemo(
+    () => cells.some((c) => c?.full),
+    [cells]
+  );
 
   const activeKey =
     rovingKey && cells.some((c) => c?.key === rovingKey)
@@ -144,13 +186,28 @@ export function BookCall() {
     const takenLocally = loadBookings()
       .filter((b) => b.date === selectedDate)
       .map((b) => b.time);
-    return bookedSlotsFor(selectedDate, takenLocally);
-  }, [selectedDate]);
+    return bookedSlotsFor(
+      selectedDate,
+      takenLocally,
+      isFullyBooked(selectedDate, today)
+    );
+  }, [selectedDate, today]);
 
   const closePanel = useCallback(() => {
     setOpen(false);
     triggerRef.current?.focus();
   }, []);
+
+  const changeMonth = useCallback(
+    (dir: number) => {
+      setView((v) => {
+        const next = new Date(v.getFullYear(), v.getMonth() + dir, 1);
+        const floor = new Date(today.getFullYear(), today.getMonth(), 1);
+        return next < floor ? v : next;
+      });
+    },
+    [today]
+  );
 
   // On open: enforce the per-device cooldown, lock body scroll, move focus in.
   useEffect(() => {
@@ -176,6 +233,24 @@ export function BookCall() {
       document.removeEventListener("keydown", onKey);
     };
   }, [open, done, closePanel]);
+
+  // Scroll (wheel) over the calendar to page through months.
+  useEffect(() => {
+    if (!open) return;
+    const el = calRef.current;
+    if (!el) return;
+    let last = 0;
+    function onWheel(e: WheelEvent) {
+      if (Math.abs(e.deltaY) < 6) return;
+      e.preventDefault();
+      const now = Date.now();
+      if (now - last < 220) return;
+      last = now;
+      changeMonth(e.deltaY > 0 ? 1 : -1);
+    }
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [open, changeMonth]);
 
   // Move DOM focus when navigating the grid with arrow keys.
   useEffect(() => {
@@ -209,6 +284,22 @@ export function BookCall() {
     }
   }
 
+  // Swipe left/right on the calendar (touch) to change months.
+  function onTouchStart(e: React.TouchEvent) {
+    const t = e.touches[0];
+    touchStart.current = { x: t.clientX, y: t.clientY };
+  }
+  function onTouchEnd(e: React.TouchEvent) {
+    if (!touchStart.current) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStart.current.x;
+    const dy = t.clientY - touchStart.current.y;
+    touchStart.current = null;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
+      changeMonth(dx < 0 ? 1 : -1);
+    }
+  }
+
   async function confirm() {
     if (!selectedDate || !selectedTime || submitting) return;
     const em = email.trim().toLowerCase();
@@ -217,6 +308,7 @@ export function BookCall() {
       return;
     }
     setEmailError(null);
+    if (messageError) return;
 
     const bookings = loadBookings();
     if (bookings.some((b) => Date.now() - b.ts < COOLDOWN_MS)) {
@@ -255,6 +347,7 @@ export function BookCall() {
           email: em,
           date: selectedDate,
           time: selectedTime,
+          message: message.trim(),
           tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
           startISO,
         }),
@@ -276,6 +369,12 @@ export function BookCall() {
   const panelTransition = reducedMotion
     ? { duration: 0 }
     : { duration: 0.2, ease: [0.16, 1, 0.3, 1] as const };
+  const slideTransition = reducedMotion
+    ? { duration: 0 }
+    : { duration: 0.3, ease: [0.16, 1, 0.3, 1] as const };
+  const arrowMotion = reducedMotion
+    ? {}
+    : { whileHover: { scale: 1.08 }, whileTap: { scale: 0.9 } };
 
   return (
     <>
@@ -316,7 +415,7 @@ export function BookCall() {
                   exit={{ opacity: 0, scale: reducedMotion ? 1 : 0.96, y: reducedMotion ? 0 : 8 }}
                   transition={panelTransition}
                   onMouseDown={(e) => e.stopPropagation()}
-                  className="relative z-10 max-h-[88vh] w-[340px] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-2xl border border-border bg-card p-5 text-left shadow-2xl outline-none"
+                  className="no-scrollbar relative z-10 max-h-[88vh] w-[340px] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-2xl border border-border bg-card p-5 text-left shadow-2xl outline-none"
                 >
                   {done ? (
                     <div className="py-4 text-center">
@@ -341,157 +440,234 @@ export function BookCall() {
                     </div>
                   ) : (
                     <>
-                      <div className="mb-3 flex items-center justify-between">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setView((v) => new Date(v.getFullYear(), v.getMonth() - 1, 1))
-                          }
-                          disabled={atCurrentMonth}
-                          aria-label="Previous month"
-                          className="flex size-8 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-muted disabled:opacity-35 disabled:hover:bg-transparent"
-                        >
-                          <ChevronLeft className="size-4" />
-                        </button>
-                        <div aria-live="polite" className="text-sm font-semibold">
-                          {MONTHS[view.getMonth()]} {view.getFullYear()}
+                      <div
+                        ref={calRef}
+                        onTouchStart={onTouchStart}
+                        onTouchEnd={onTouchEnd}
+                      >
+                        <div className="mb-3 flex items-center justify-between">
+                          <motion.button
+                            type="button"
+                            {...arrowMotion}
+                            onClick={() => changeMonth(-1)}
+                            disabled={atCurrentMonth}
+                            aria-label="Previous month"
+                            className="flex size-8 items-center justify-center rounded-lg border border-border text-muted-foreground shadow-sm transition-colors hover:bg-muted hover:shadow-md disabled:opacity-35 disabled:shadow-none disabled:hover:bg-transparent"
+                          >
+                            <ChevronLeft className="size-4" />
+                          </motion.button>
+                          <div aria-live="polite" className="text-sm font-semibold">
+                            {MONTHS[view.getMonth()]} {view.getFullYear()}
+                          </div>
+                          <motion.button
+                            type="button"
+                            {...arrowMotion}
+                            onClick={() => changeMonth(1)}
+                            aria-label="Next month"
+                            className="flex size-8 items-center justify-center rounded-lg border border-border text-muted-foreground shadow-sm transition-colors hover:bg-muted hover:shadow-md"
+                          >
+                            <ChevronRight className="size-4" />
+                          </motion.button>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setView((v) => new Date(v.getFullYear(), v.getMonth() + 1, 1))
-                          }
-                          aria-label="Next month"
-                          className="flex size-8 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-muted"
-                        >
-                          <ChevronRight className="size-4" />
-                        </button>
-                      </div>
 
-                      <div role="grid" aria-label="Choose a date">
-                        <div role="row" className="mb-1.5 grid grid-cols-7">
-                          {DOW.map((d) => (
-                            <span
-                              key={d}
-                              role="columnheader"
-                              className="py-1 text-center text-[11px] font-semibold text-muted-foreground/70"
-                            >
-                              {d}
-                            </span>
-                          ))}
-                        </div>
-                        <div
-                          ref={gridRef}
-                          className="grid grid-cols-7 gap-0.5"
-                          onKeyDown={onGridKeyDown}
-                        >
-                          {cells.map((cell, i) =>
-                            cell === null ? (
-                              <span key={`e${i}`} role="gridcell" aria-hidden="true" />
-                            ) : (
-                              <button
-                                key={cell.key}
-                                type="button"
-                                role="gridcell"
-                                data-key={cell.key}
-                                tabIndex={cell.key === activeKey ? 0 : -1}
-                                aria-disabled={cell.disabled || undefined}
-                                aria-selected={cell.key === selectedDate}
-                                aria-label={new Date(cell.key).toDateString()}
-                                onClick={() => !cell.disabled && pickDate(cell.key)}
-                                className={cn(
-                                  "flex aspect-square items-center justify-center rounded-lg text-[13px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-foreground",
-                                  cell.disabled
-                                    ? "cursor-not-allowed text-muted-foreground/30"
-                                    : "text-foreground hover:bg-muted",
-                                  cell.key === selectedDate &&
-                                    "bg-foreground text-background hover:bg-foreground"
-                                )}
+                        <div role="grid" aria-label="Choose a date">
+                          <div role="row" className="mb-1.5 grid grid-cols-7">
+                            {DOW.map((d) => (
+                              <span
+                                key={d}
+                                role="columnheader"
+                                className="py-1 text-center text-[11px] font-semibold text-muted-foreground/70"
                               >
-                                {cell.day}
-                              </button>
-                            )
-                          )}
-                        </div>
-                      </div>
-
-                      {selectedDate && bookedSlots && (
-                        <div className="mt-4 border-t border-border pt-4">
-                          <div className="mb-2.5 text-xs font-medium text-muted-foreground/70">
-                            Available times
+                                {d}
+                              </span>
+                            ))}
                           </div>
                           <div
-                            role="listbox"
-                            aria-label="Available time slots"
-                            className="grid grid-cols-3 gap-1.5"
+                            ref={gridRef}
+                            className="grid grid-cols-7 gap-0.5"
+                            onKeyDown={onGridKeyDown}
                           >
-                            {SLOTS.map((t) => {
-                              const isBooked = bookedSlots.has(t);
-                              const isSel = selectedTime === t;
-                              return (
+                            {cells.map((cell, i) =>
+                              cell === null ? (
+                                <span key={`e${i}`} role="gridcell" aria-hidden="true" />
+                              ) : (
                                 <button
-                                  key={t}
+                                  key={cell.key}
                                   type="button"
-                                  role="option"
-                                  aria-selected={isSel}
-                                  aria-disabled={isBooked || undefined}
-                                  aria-label={`${t} — ${isBooked ? "unavailable" : "available"}`}
-                                  onClick={() => {
-                                    if (isBooked) return;
-                                    setSelectedTime(t);
-                                    setNotice(null);
-                                  }}
+                                  role="gridcell"
+                                  data-key={cell.key}
+                                  tabIndex={cell.key === activeKey ? 0 : -1}
+                                  aria-disabled={cell.disabled || cell.full || undefined}
+                                  aria-selected={cell.key === selectedDate}
+                                  aria-label={`${new Date(cell.key).toDateString()}${cell.full ? " — fully booked" : ""}`}
+                                  onClick={() =>
+                                    !cell.disabled && !cell.full && pickDate(cell.key)
+                                  }
                                   className={cn(
-                                    "rounded-lg border py-2 text-center text-[12.5px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-foreground",
-                                    isBooked
-                                      ? "cursor-not-allowed border-border bg-muted text-muted-foreground/40 line-through"
-                                      : "border-border text-foreground hover:border-foreground",
-                                    isSel &&
-                                      "border-foreground bg-foreground text-background hover:border-foreground"
+                                    "relative flex aspect-square items-center justify-center rounded-lg text-[13px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-foreground",
+                                    cell.disabled
+                                      ? "cursor-not-allowed text-muted-foreground/30"
+                                      : cell.full
+                                        ? "cursor-not-allowed text-muted-foreground/50"
+                                        : "text-foreground hover:bg-muted",
+                                    cell.key === selectedDate &&
+                                      "bg-foreground text-background hover:bg-foreground"
                                   )}
                                 >
-                                  {t}
+                                  {cell.day}
+                                  {cell.full && cell.key !== selectedDate && (
+                                    <span className="absolute bottom-[3px] left-1/2 size-1 -translate-x-1/2 rounded-full bg-amber-500" />
+                                  )}
                                 </button>
-                              );
-                            })}
+                              )
+                            )}
                           </div>
                         </div>
-                      )}
 
-                      {selectedTime && (
-                        <div className="mt-4">
-                          <label
-                            htmlFor="dcw-email"
-                            className="mb-1.5 block text-xs font-medium text-muted-foreground/70"
+                        {monthHasFull && (
+                          <div className="mt-2.5 flex items-center justify-end gap-1 text-[10px] text-muted-foreground/60">
+                            <span className="size-1 rounded-full bg-amber-500" />
+                            Fully booked
+                          </div>
+                        )}
+                      </div>
+
+                      <AnimatePresence initial={false}>
+                        {selectedDate && bookedSlots && (
+                          <motion.div
+                            key={selectedDate}
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={slideTransition}
+                            className="overflow-hidden"
                           >
-                            Your email
-                          </label>
-                          <input
-                            id="dcw-email"
-                            type="email"
-                            inputMode="email"
-                            autoComplete="email"
-                            placeholder="you@example.com"
-                            value={email}
-                            onChange={(e) => {
-                              setEmail(e.target.value);
-                              if (emailError) setEmailError(null);
-                              if (notice) setNotice(null);
-                            }}
-                            aria-invalid={emailError ? true : undefined}
-                            aria-describedby={emailError ? "dcw-email-err" : undefined}
-                            className={cn(
-                              "w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-foreground",
-                              emailError ? "border-red-500" : "border-border"
-                            )}
-                          />
-                          {emailError && (
-                            <p id="dcw-email-err" className="mt-1 text-xs text-red-500">
-                              {emailError}
-                            </p>
-                          )}
-                        </div>
-                      )}
+                            <div className="mt-4 border-t border-border pt-4">
+                              <div className="mb-2.5 text-xs font-medium text-muted-foreground/70">
+                                Available times
+                              </div>
+                              <div
+                                role="listbox"
+                                aria-label="Available time slots"
+                                className="grid grid-cols-3 gap-1.5"
+                              >
+                                {SLOTS.map((t) => {
+                                  const isBooked = bookedSlots.has(t);
+                                  const isSel = selectedTime === t;
+                                  return (
+                                    <button
+                                      key={t}
+                                      type="button"
+                                      role="option"
+                                      aria-selected={isSel}
+                                      aria-disabled={isBooked || undefined}
+                                      aria-label={`${t} — ${isBooked ? "unavailable" : "available"}`}
+                                      onClick={() => {
+                                        if (isBooked) return;
+                                        setSelectedTime(t);
+                                        setNotice(null);
+                                      }}
+                                      className={cn(
+                                        "rounded-lg border py-2 text-center text-[12.5px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-foreground",
+                                        isBooked
+                                          ? "cursor-not-allowed border-border bg-muted text-muted-foreground/40 line-through"
+                                          : "border-border text-foreground hover:border-foreground",
+                                        isSel &&
+                                          "border-foreground bg-foreground text-background hover:border-foreground"
+                                      )}
+                                    >
+                                      {t}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      <AnimatePresence initial={false}>
+                        {selectedTime && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={slideTransition}
+                            className="overflow-hidden"
+                          >
+                            <div className="mt-4">
+                              <label
+                                htmlFor="dcw-email"
+                                className="mb-1.5 block text-xs font-medium text-muted-foreground/70"
+                              >
+                                Your email
+                              </label>
+                              <input
+                                id="dcw-email"
+                                type="email"
+                                inputMode="email"
+                                autoComplete="email"
+                                placeholder="you@example.com"
+                                value={email}
+                                onChange={(e) => {
+                                  setEmail(e.target.value);
+                                  if (emailError) setEmailError(null);
+                                  if (notice) setNotice(null);
+                                }}
+                                aria-invalid={emailError ? true : undefined}
+                                aria-describedby={emailError ? "dcw-email-err" : undefined}
+                                className={cn(
+                                  "w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-foreground",
+                                  emailError ? "border-red-500" : "border-border"
+                                )}
+                              />
+                              {emailError && (
+                                <p id="dcw-email-err" className="mt-1 text-xs text-red-500">
+                                  {emailError}
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="mt-3">
+                              <label
+                                htmlFor="dcw-message"
+                                className="mb-1.5 flex items-center justify-between text-xs font-medium text-muted-foreground/70"
+                              >
+                                <span>Message (optional)</span>
+                                <span
+                                  className={cn(
+                                    "tabular-nums",
+                                    messageError ? "text-red-500" : "text-muted-foreground/50"
+                                  )}
+                                >
+                                  {message.length}/{MAX_MESSAGE}
+                                </span>
+                              </label>
+                              <textarea
+                                id="dcw-message"
+                                rows={2}
+                                placeholder="A line about what you'd like to discuss…"
+                                value={message}
+                                onChange={(e) => {
+                                  setMessage(e.target.value);
+                                  if (notice) setNotice(null);
+                                }}
+                                aria-invalid={messageError ? true : undefined}
+                                aria-describedby={messageError ? "dcw-message-err" : undefined}
+                                className={cn(
+                                  "w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-foreground",
+                                  messageError ? "border-red-500" : "border-border"
+                                )}
+                              />
+                              {messageError && (
+                                <p id="dcw-message-err" className="mt-1 text-xs text-red-500">
+                                  {messageError}
+                                </p>
+                              )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
 
                       {notice && (
                         <p role="alert" className="mt-3 text-xs text-amber-600">
@@ -506,7 +682,13 @@ export function BookCall() {
                       <button
                         type="button"
                         onClick={confirm}
-                        disabled={!selectedDate || !selectedTime || !email.trim() || submitting}
+                        disabled={
+                          !selectedDate ||
+                          !selectedTime ||
+                          !email.trim() ||
+                          !!messageError ||
+                          submitting
+                        }
                         className="mt-3.5 w-full rounded-xl bg-primary py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground/60"
                       >
                         {submitting ? "Booking…" : "Confirm booking"}

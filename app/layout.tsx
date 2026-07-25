@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
-import { Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
+import { Manrope, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { site } from "@/lib/site";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
   display: "swap",
 });
@@ -37,10 +37,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${inter.variable} ${interTight.variable} ${jetbrainsMono.variable} antialiased`}
-      >
+    // Font variables must live on <html>: Tailwind's preflight resolves
+    // font-family on the root, so defining them on <body> leaves the var()
+    // chain undefined there and the page falls back to the browser default.
+    <html
+      lang="en"
+      className={`${manrope.variable} ${interTight.variable} ${jetbrainsMono.variable}`}
+    >
+      <body className="antialiased">
         <SiteNav />
         {children}
         <SiteFooter />

@@ -49,11 +49,11 @@ export function Contact() {
             <Mail className="size-4" />
             Email
           </PillLink>
-          <PillLink href={site.github} variant="ghost-dark">
+          <PillLink href={site.github} variant="ghost-dark" target="_blank">
             <GithubIcon />
             GitHub
           </PillLink>
-          <PillLink href={site.linkedin} variant="ghost-dark">
+          <PillLink href={site.linkedin} variant="ghost-dark" target="_blank">
             <LinkedinIcon />
             LinkedIn
           </PillLink>

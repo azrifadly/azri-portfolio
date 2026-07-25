@@ -12,6 +12,16 @@ export interface CaseStudySection {
   body: string[];
 }
 
+export interface ProductMedia {
+  type: "image" | "video";
+  /** Public path, e.g. "/products/tradelogio/shot-1.jpg". */
+  src: string;
+  /** Alt text for images, accessible label for videos. */
+  alt: string;
+  /** Optional poster frame for videos. */
+  poster?: string;
+}
+
 export interface Product {
   slug: string;
   title: string;
@@ -26,7 +36,9 @@ export interface Product {
     /** One-line subtitle under the title on the detail page. */
     headline: string;
     sections: CaseStudySection[];
-    stack: string[];
+    stack?: string[];
+    /** Optional screenshots/video shown in a carousel below the header. */
+    media?: ProductMedia[];
     /** Optional external link (live product, repo, etc.). */
     link?: { label: string; href: string };
   };
@@ -47,29 +59,49 @@ export const products: Product[] = [
         {
           heading: "The problem",
           body: [
-            "Traders keep their records in scattered spreadsheets, which makes it hard to see what's actually working across dozens of trades. Tradelogio set out to make logging trades effortless and reviewing them a habit rather than a chore.",
+            "Most traders keep their records scattered across spreadsheets, and that makes it almost impossible to see what's actually working across a run of trades. I wanted logging a trade to feel effortless, and reviewing them to become a habit instead of a chore you avoid.",
           ],
         },
         {
           heading: "How it worked",
           body: [
-            "A journal page organised trades into folders with a calendar view, so a month of activity was visible at a glance. A markets page pulled live crypto and forex prices, charted with Lightweight Charts, alongside the journal. Auth, data and storage ran on Supabase, with Resend handling transactional email and a waitlist.",
-            "The product shipped on a freemium model — a free tier capped at 50 trades and a $19/month Pro tier — behind a dark, brutalist interface with green accents.",
+            "The journal grouped trades into folders and laid them out on a calendar, so a whole month of activity was visible at a glance. Alongside it, a markets view pulled in live crypto and forex prices with clean, interactive charts, so you could look at the market and your own record side by side. Accounts, data and email all ran on a hosted backend, which kept the whole thing lean enough to build and ship on my own.",
+            "It went out as a freemium product — a free tier with limited usage, and a low-cost monthly plan for anyone who wanted more.",
           ],
         },
         {
           heading: "Why it was decommissioned",
           body: [
-            "Tradelogio was my main build focus for an extended stretch, but was deprioritised under time constraints with the dashboard still unfinished. I moved on to other priorities and stopped maintaining it — though the build taught me a lot. If it's ever resumed, the first job is consolidating the crypto and forex charts into a single Lightweight Charts wrapper for a consistent look across the platform.",
+            "This was my main focus for a good stretch, but time got tight and I had to set it down with the dashboard still unfinished. I moved on to other priorities and stopped maintaining it. I don't regret it — the build taught me a lot. If I ever pick it back up, the first job is pulling the charts into a single, consistent view so everything looks the same across the app.",
           ],
         },
       ],
-      stack: [
-        "Next.js",
-        "Supabase",
-        "Tailwind CSS",
-        "Lightweight Charts",
-        "Resend",
+      media: [
+        {
+          type: "video",
+          src: "/products/tradelogio/demo.mov",
+          alt: "Tradelogio walkthrough",
+        },
+        {
+          type: "image",
+          src: "/products/tradelogio/shot-3.jpg",
+          alt: "Tradelogio landing page with an equity curve and a waitlist sign-up",
+        },
+        {
+          type: "image",
+          src: "/products/tradelogio/shot-4.jpg",
+          alt: "Tradelogio dashboard showing P&L, win rate, an account equity chart and a trade calendar",
+        },
+        {
+          type: "image",
+          src: "/products/tradelogio/shot-1.jpg",
+          alt: "Tradelogio markets page listing live crypto and forex prices",
+        },
+        {
+          type: "image",
+          src: "/products/tradelogio/shot-2.jpg",
+          alt: "Tradelogio market detail view with a candlestick chart",
+        },
       ],
     },
   },
@@ -77,7 +109,7 @@ export const products: Product[] = [
     slug: "flymehere",
     title: "FlyMeHere",
     description:
-      "AI flight search for Southeast Asia. Describe your trip in plain language and Claude extracts the intent, then it searches every airline — including the regional carriers with the cheapest fares.",
+      "AI flight search for Southeast Asia. Describe your trip in plain language and it works out what you mean, then searches every airline — including the regional carriers with the cheapest fares.",
     status: "building",
     tag: "Travel / AI search",
     iconLetter: "F",
@@ -87,24 +119,23 @@ export const products: Product[] = [
         {
           heading: "The problem",
           body: [
-            "Finding cheap flights in Southeast Asia means filling in rigid search forms and still missing the regional budget carriers that often have the best deals. Mainstream search engines under-index the region, so the cheapest option is frequently the one you never see.",
+            "Finding a cheap flight in Southeast Asia usually means wrestling with rigid search forms — and even then, you miss the small regional carriers that often have the best fares. The big search engines just don't cover the region well, so the cheapest option is frequently the one you never get shown.",
           ],
         },
         {
           heading: "How it works",
           body: [
-            "Instead of a form, you describe the trip — \"Bali next month with my family on a budget\" — and Claude (Haiku 4.5) extracts the travel intent: destination, origin, dates and flexibility, travellers, budget tier and trip type. Each field carries a confidence score, so the search degrades gracefully when something can't be pulled from the sentence.",
-            "That structured intent then drives a search across airlines, with the regional carriers mainstream engines miss included, focused on Southeast Asia for faster, better-informed results.",
+            "Instead of a form, you just describe the trip — \"Bali next month with my family on a budget\" — and it works out what you actually mean: where you're going, roughly when, how flexible you are, who's travelling and what you want to spend. When something's fuzzy, it makes a sensible guess rather than making you spell everything out.",
+            "From there it searches across airlines — including the regional budget carriers the mainstream engines skip — and keeps everything focused on Southeast Asia, so the results come back faster and closer to what you asked for.",
           ],
         },
         {
           heading: "Status",
           body: [
-            "In active development, and the product I'm building right now. The landing page is live and natural-language intent extraction is working; the next phase is wiring in live flight-search APIs (Skyscanner, Amadeus).",
+            "This is the one I'm building right now. The landing page is live and the natural-language part already works — you can describe a trip and watch it pull the details out. Next up is wiring in live fare data so it can return real flights.",
           ],
         },
       ],
-      stack: ["Next.js", "Claude API", "Supabase", "Tailwind CSS"],
     },
   },
 ];

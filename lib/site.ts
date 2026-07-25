@@ -4,6 +4,8 @@ export const site = {
   location: "Singapore",
   github: "#",
   linkedin: "#",
+  /** Production origin — used for canonical + OpenGraph URLs. Update to your real domain. */
+  url: "https://azri.dev",
 };
 
 export const navLinks = [

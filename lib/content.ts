@@ -9,7 +9,6 @@ export const marqueeBadges = [
   "Tailwind",
   "Supabase",
   "Postgres",
-  "Docker",
   "Vercel",
   "GitHub",
 ] as const;
@@ -52,11 +51,12 @@ export interface JourneyStep {
 }
 
 export const journey: JourneyStep[] = [
-  { title: "Started as IAM Engineer", state: "done" },
-  { title: "Started learning AI development", state: "done" },
-  { title: "Built and shipped KasWatch", state: "done" },
-  { title: "Launching TicketPilot", state: "done" },
-  { title: "Building AI SaaS products", state: "building" },
+  {
+    title: "Started out as an IAM engineer, keeping enterprise banking infrastructure running",
+    state: "done",
+  },
+  { title: "Then got into AI development and automation", state: "done" },
+  { title: "Now building AI SaaS products", state: "building" },
 ];
 
 export interface TechGroup {
@@ -65,43 +65,15 @@ export interface TechGroup {
 }
 
 export const techGroups: TechGroup[] = [
-  { label: "Building with AI", items: ["OpenAI", "Claude", "Cursor", "n8n"] },
+  { label: "Building with AI", items: ["OpenAI", "Claude", "Cursor"] },
   {
     label: "Core stack",
     items: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
   },
   {
     label: "Infrastructure",
-    items: ["Supabase", "PostgreSQL", "Docker", "Vercel", "GitHub"],
+    items: ["Supabase", "PostgreSQL", "Vercel", "GitHub"],
   },
 ];
 
 export type BlogCover = "ai" | "automation" | "career";
-
-export interface BlogPost {
-  topic: string;
-  title: string;
-  cover: BlogCover;
-  href: string;
-}
-
-export const blogPosts: BlogPost[] = [
-  {
-    topic: "Artificial intelligence",
-    title: "What actually breaks when you put AI in a production workflow",
-    cover: "ai",
-    href: "#",
-  },
-  {
-    topic: "Automation",
-    title: "The boring parts of IT support that AI is good at fixing",
-    cover: "automation",
-    href: "#",
-  },
-  {
-    topic: "Career",
-    title: "Moving from IAM engineering into building products",
-    cover: "career",
-    href: "#",
-  },
-];

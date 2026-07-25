@@ -87,21 +87,6 @@ export const techIcons: Record<MarqueeBadge, React.ReactNode> = {
       />
     </svg>
   ),
-  Docker: (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <rect x="3" y="11" width="3.2" height="3.2" stroke="currentColor" strokeWidth="1.3" />
-      <rect x="6.8" y="11" width="3.2" height="3.2" stroke="currentColor" strokeWidth="1.3" />
-      <rect x="10.6" y="11" width="3.2" height="3.2" stroke="currentColor" strokeWidth="1.3" />
-      <rect x="6.8" y="7.2" width="3.2" height="3.2" stroke="currentColor" strokeWidth="1.3" />
-      <rect x="10.6" y="7.2" width="3.2" height="3.2" stroke="currentColor" strokeWidth="1.3" />
-      <path
-        d="M2.2 14.3h17.8c0 3.6-2.6 6-6.4 6-5.6 0-9.6-2.2-11.4-6Z"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinejoin="round"
-      />
-    </svg>
-  ),
   Vercel: (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M12 3.5 21 19.5H3z" fill="currentColor" />

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { PillLink } from "@/components/pill-link";
+import { ProductCarousel } from "@/components/product-carousel";
 import { StatusDot } from "@/components/status-dot";
 import { getProduct, products } from "@/lib/products";
 
@@ -59,6 +60,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </span>
       </header>
 
+      {product.caseStudy.media && product.caseStudy.media.length > 0 && (
+        <div className="mb-12">
+          <ProductCarousel media={product.caseStudy.media} />
+        </div>
+      )}
+
       <div className="space-y-10">
         {product.caseStudy.sections.map((section) => (
           <section key={section.heading}>
@@ -76,21 +83,23 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </section>
         ))}
 
-        <section>
-          <h2 className="mb-4 font-display text-xl font-extrabold tracking-[-0.01em]">
-            Stack
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {product.caseStudy.stack.map((item) => (
-              <span
-                key={item}
-                className="rounded-[10px] border border-border bg-card px-3.5 py-2 text-[13px] font-medium"
-              >
-                {item}
-              </span>
-            ))}
-          </div>
-        </section>
+        {product.caseStudy.stack && product.caseStudy.stack.length > 0 && (
+          <section>
+            <h2 className="mb-4 font-display text-xl font-extrabold tracking-[-0.01em]">
+              Stack
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {product.caseStudy.stack.map((item) => (
+                <span
+                  key={item}
+                  className="rounded-[10px] border border-border bg-card px-3.5 py-2 text-[13px] font-medium"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
 
         {product.caseStudy.link && (
           <PillLink

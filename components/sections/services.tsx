@@ -1,5 +1,4 @@
-import { ArrowRight } from "lucide-react";
-import { PillLink } from "@/components/pill-link";
+import { BookCall } from "@/components/book-call";
 import { Reveal } from "@/components/reveal";
 import { services } from "@/lib/content";
 
@@ -27,14 +26,7 @@ export function Services() {
           ))}
         </div>
         <Reveal className="text-center">
-          <PillLink
-            href="/#contact"
-            variant="primary"
-            className="px-[26px] py-3.5"
-          >
-            Book a discovery call
-            <ArrowRight className="size-4" />
-          </PillLink>
+          <BookCall />
         </Reveal>
       </div>
     </section>

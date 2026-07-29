@@ -56,7 +56,7 @@ export const products: Product[] = [
     slug: "tradelogio",
     title: "Tradelogio",
     description:
-      "A trading journal SaaS with a calendar-based journal, trade folders and live crypto and forex market data. Built and shipped as a freemium product, since shelved.",
+      "A trading journal built to make reviewing trades a habit rather than a chore. Trades land on a monthly calendar and group into folders, with P&L, win rate and an equity curve tracked alongside live crypto and forex charts.",
     status: "discontinued",
     tag: "Trading / SaaS",
     iconLetter: "T",
@@ -117,7 +117,7 @@ export const products: Product[] = [
     slug: "flymehere",
     title: "FlyMeHere",
     description:
-      "An AI flight search agent for Southeast Asia, scrapped before launch. A technical post-mortem on why API gatekeeping makes some markets inaccessible to bootstrapped founders — even when the tech works.",
+      "Flight search for Southeast Asia you describe in plain language instead of filling in a form — route, dates, budget and flexibility inferred for you, pairing a conversational view with a sortable results list and price-drop alerts.",
     status: "discontinued",
     tag: "Travel / AI search",
     iconLetter: "F",

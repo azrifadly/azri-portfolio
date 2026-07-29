@@ -15,7 +15,7 @@ export function FeaturedProducts() {
             What I&apos;ve built, and what I&apos;m building next.
           </h2>
         </Reveal>
-        <div className="grid grid-cols-1 gap-5 min-[561px]:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 min-[561px]:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => (
             <Reveal key={product.slug} className="h-full">
               <ProductCard product={product} />

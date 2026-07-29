@@ -37,7 +37,7 @@ export default function BlogIndexPage() {
         {blogPosts.map((post) => {
           const card = (
             <>
-              <BlogCoverArt cover={post.cover} />
+              <BlogCoverArt cover={post.cover} image={post.coverImage} />
               <div className="px-6 pb-6 pt-5">
                 <span className="font-mono text-[11px] font-medium tracking-[0.02em] text-brand">
                   {post.topic.toUpperCase()}

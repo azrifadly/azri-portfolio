@@ -1,9 +1,12 @@
+import Image from "next/image";
 import type { BlogCover } from "@/lib/content";
+import { cn } from "@/lib/utils";
 
 /**
  * Abstract geometric cover illustrations for blog cards — one motif per
  * topic: connected nodes (AI), gear pair (automation), ascending path
- * (career). Ported 1:1 from the approved preview.
+ * (career), path into a wall (startup). The first three are ported 1:1
+ * from the approved preview.
  */
 
 const ACCENT = "#5B5CEB";
@@ -123,12 +126,110 @@ function CareerCover() {
   );
 }
 
+/**
+ * Deliberate rhyme with CareerCover: the same ascending path, stopped dead by
+ * a wall, with the route it can't reach ghosted on the far side.
+ */
+function StartupCover() {
+  const reached: [number, number][] = [
+    [30, 132], [72, 118], [114, 96], [152, 78],
+  ];
+  const beyond: [number, number][] = [
+    [212, 66], [248, 44], [278, 36],
+  ];
+  const wallX = 182;
+  const hatches = Array.from({ length: 5 }, (_, i) => 40 + i * 21);
+  return (
+    <svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <rect width="300" height="160" fill={COVER_BG} />
+
+      <polyline
+        points={reached.map(([x, y]) => `${x},${y}`).join(" ")}
+        fill="none"
+        stroke={ACCENT}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity="0.85"
+      />
+      {reached.map(([x, y], i) => (
+        <circle
+          key={i}
+          cx={x}
+          cy={y}
+          r={i === reached.length - 1 ? 5 : 3.5}
+          fill={ACCENT}
+          opacity={i === reached.length - 1 ? 1 : 0.6}
+        />
+      ))}
+
+      <g stroke={ACCENT}>
+        <line x1={wallX} y1="26" x2={wallX} y2="140" strokeWidth="2" opacity="0.9" />
+        {hatches.map((y) => (
+          <line
+            key={y}
+            x1={wallX}
+            y1={y}
+            x2={wallX + 9}
+            y2={y - 9}
+            strokeWidth="1.2"
+            opacity="0.4"
+          />
+        ))}
+      </g>
+
+      <polyline
+        points={beyond.map(([x, y]) => `${x},${y}`).join(" ")}
+        fill="none"
+        stroke={ACCENT}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeDasharray="4 5"
+        opacity="0.3"
+      />
+      {beyond.map(([x, y], i) => (
+        <circle key={i} cx={x} cy={y} r={3.5} fill={ACCENT} opacity="0.25" />
+      ))}
+    </svg>
+  );
+}
+
 const COVERS: Record<BlogCover, React.ReactNode> = {
   ai: <AiCover />,
   automation: <AutomationCover />,
   career: <CareerCover />,
+  startup: <StartupCover />,
 };
 
-export function BlogCoverArt({ cover }: { cover: BlogCover }) {
-  return <div className="h-[140px] w-full [&>svg]:block [&>svg]:size-full">{COVERS[cover]}</div>;
+export function BlogCoverArt({
+  cover,
+  image,
+  className,
+}: {
+  cover: BlogCover;
+  /** Photo thumbnail; replaces the geometric art when present. */
+  image?: { src: string; alt: string };
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "relative h-[140px] w-full [&>svg]:block [&>svg]:size-full",
+        className
+      )}
+    >
+      {image ? (
+        <Image
+          src={image.src}
+          alt={image.alt}
+          fill
+          sizes="(max-width: 760px) 100vw, 760px"
+          className="object-cover"
+        />
+      ) : (
+        COVERS[cover]
+      )}
+    </div>
+  );
 }

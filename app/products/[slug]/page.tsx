@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { PillLink } from "@/components/pill-link";
 import { ProductCarousel } from "@/components/product-carousel";
+import { ProductIcon } from "@/components/product-icon";
 import { StatusDot } from "@/components/status-dot";
 import { getProduct, products } from "@/lib/products";
 
@@ -44,10 +45,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
       <header className="mb-12">
         <div className="mb-6 flex items-start justify-between">
-          <div className="flex size-14 items-center justify-center rounded-2xl bg-brand-soft font-display text-xl font-extrabold text-brand">
-            {product.iconLetter}
-          </div>
-          <StatusDot status={product.status} />
+          <ProductIcon product={product} className="size-14 rounded-2xl text-xl" />
+          <StatusDot status={product.status} note={product.statusNote} />
         </div>
         <h1 className="mb-3 font-display text-[clamp(32px,4.5vw,44px)] font-extrabold leading-[1.1] tracking-[-0.03em]">
           {product.title}
@@ -80,6 +79,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 {paragraph}
               </p>
             ))}
+            {section.bullets && section.bullets.length > 0 && (
+              <ul className="mb-4 list-disc space-y-2 pl-5 text-base leading-[1.7] text-muted-foreground">
+                {section.bullets.map((bullet) => (
+                  <li key={bullet.slice(0, 40)}>{bullet}</li>
+                ))}
+              </ul>
+            )}
           </section>
         ))}
 

@@ -1,4 +1,5 @@
 import { ProductCard } from "@/components/product-card";
+import { ProductTeaserCard } from "@/components/product-teaser-card";
 import { Reveal } from "@/components/reveal";
 import { products } from "@/lib/products";
 
@@ -20,6 +21,9 @@ export function FeaturedProducts() {
               <ProductCard product={product} />
             </Reveal>
           ))}
+          <Reveal className="h-full">
+            <ProductTeaserCard />
+          </Reveal>
         </div>
       </div>
     </section>

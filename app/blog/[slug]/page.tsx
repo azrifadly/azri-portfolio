@@ -150,7 +150,12 @@ export default async function BlogPostPage({ params }: BlogPageProps) {
       </header>
 
       <div className="mb-10 overflow-hidden rounded-2xl border border-border">
-        <BlogCoverArt cover={post.cover} />
+        <BlogCoverArt
+          cover={post.cover}
+          image={post.coverImage}
+          /* Photos get room to breathe; geometric covers keep their original height. */
+          className={post.coverImage ? "h-[260px]" : undefined}
+        />
       </div>
 
       <article>

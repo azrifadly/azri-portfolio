@@ -5,11 +5,14 @@
  * To add product #21: append one object here. No component changes needed.
  */
 
-export type ProductStatus = "live" | "building" | "soon" | "decommissioned";
+/** "discontinued" covers both shipped-then-retired and killed-before-launch. */
+export type ProductStatus = "live" | "building" | "soon" | "discontinued";
 
 export interface CaseStudySection {
   heading: string;
   body: string[];
+  /** Optional bullet list rendered after the body paragraphs. */
+  bullets?: string[];
 }
 
 export interface ProductMedia {
@@ -28,10 +31,14 @@ export interface Product {
   /** Short description shown on the homepage card and detail page header. */
   description: string;
   status: ProductStatus;
+  /** Optional qualifier appended to the status pill, e.g. "Jul 2026". */
+  statusNote?: string;
   /** Monospace tag shown in the card footer, e.g. "Bot / infra". */
   tag: string;
-  /** Letter rendered in the icon square. Usually the first letter of the title. */
+  /** Letter rendered in the icon square. Used whenever `logo` is absent. */
   iconLetter: string;
+  /** Product logo filling the icon square. Takes precedence over `iconLetter`. */
+  logo?: { src: string; alt: string };
   caseStudy: {
     /** One-line subtitle under the title on the detail page. */
     headline: string;
@@ -50,9 +57,10 @@ export const products: Product[] = [
     title: "Tradelogio",
     description:
       "A trading journal SaaS with a calendar-based journal, trade folders and live crypto and forex market data. Built and shipped as a freemium product, since shelved.",
-    status: "decommissioned",
+    status: "discontinued",
     tag: "Trading / SaaS",
     iconLetter: "T",
+    logo: { src: "/products/tradelogio/logo.jpg", alt: "Tradelogio logo" },
     caseStudy: {
       headline: "A freemium trading journal, built solo.",
       sections: [
@@ -109,33 +117,69 @@ export const products: Product[] = [
     slug: "flymehere",
     title: "FlyMeHere",
     description:
-      "AI flight search for Southeast Asia. Describe your trip in plain language and it works out what you mean, then searches every airline — including the regional carriers with the cheapest fares.",
-    status: "building",
+      "An AI flight search agent for Southeast Asia, scrapped before launch. A technical post-mortem on why API gatekeeping makes some markets inaccessible to bootstrapped founders — even when the tech works.",
+    status: "discontinued",
     tag: "Travel / AI search",
     iconLetter: "F",
+    logo: { src: "/products/flymehere/logo.jpg", alt: "FlyMeHere logo" },
     caseStudy: {
-      headline: "Tell us where you want to go — we find the cheapest way there.",
+      headline: "A technical case study in market barriers.",
       sections: [
         {
           heading: "The problem",
           body: [
-            "Finding a cheap flight in Southeast Asia usually means wrestling with rigid search forms — and even then, you miss the small regional carriers that often have the best fares. The big search engines just don't cover the region well, so the cheapest option is frequently the one you never get shown.",
+            "Finding a cheap flight in Southeast Asia usually means wrestling with rigid search forms — and even then, you miss the small regional carriers that often have the best fares. The big engines don't cover the region well, and neither of them will quietly keep watching a route for you and speak up when the price moves.",
           ],
         },
         {
-          heading: "How it works",
+          heading: "How it worked",
           body: [
-            "Instead of a form, you just describe the trip — \"Bali next month with my family on a budget\" — and it works out what you actually mean: where you're going, roughly when, how flexible you are, who's travelling and what you want to spend. When something's fuzzy, it makes a sensible guess rather than making you spell everything out.",
-            "From there it searches across airlines — including the regional budget carriers the mainstream engines skip — and keeps everything focused on Southeast Asia, so the results come back faster and closer to what you asked for.",
+            "Instead of a form, you'd describe the trip — \"Bali next month with my family on a budget\" — and it would work out what you actually meant: where you're going, roughly when, how flexible you are, who's travelling and what you want to spend. That part got built, and it worked. Claude handled the intent extraction, and the plan from there was to feed those parameters into a flight pricing API, rank what came back, and keep watching the route in the background.",
           ],
         },
         {
-          heading: "Status",
+          heading: "Why I scrapped it",
           body: [
-            "This is the one I'm building right now. The landing page is live and the natural-language part already works — you can describe a trip and watch it pull the details out. Next up is wiring in live fare data so it can return real flights.",
+            "There was no flight pricing API I could actually buy. Every viable provider gates access behind something a pre-launch solo founder doesn't have — traffic you're expected to already command, or a jurisdiction and a legal entity you either have or you don't.",
+          ],
+          bullets: [
+            "Skyscanner — around 100K+ monthly active users, 500+ followers, and a content history under a year old.",
+            "Kiwi — formerly the accessible option; the partner programme now expects roughly 50K+ monthly active users.",
+            "Duffel — the best developer experience in the category, but live fares need KYC and business registration, and Singapore isn't a supported jurisdiction.",
+            "Amadeus — the Self-Service tier, the one genuinely open door in the industry, was decommissioned on 17 July 2026.",
+          ],
+        },
+        {
+          heading: "What I took from it",
+          body: [
+            "I tried routing around it — a Telegram bot for distribution, a scraper-backed free tier for data — and neither survived contact with the arithmetic. The real diagnosis was that the problem had never been distribution or technology. The data itself was gatekept, and that had been the binding constraint the whole time.",
+            "So I scrapped it in July 2026, with the language layer working and nothing real to put behind it. Short and worth it: the wall announced itself as soon as I went looking, which is the whole skill — telling a structural problem apart from an execution problem before you've spent six months on it.",
           ],
         },
       ],
+      media: [
+        {
+          type: "image",
+          src: "/products/flymehere/shot-1.png",
+          alt: "FlyMeHere landing page with a plain-language trip search box",
+        },
+        {
+          type: "image",
+          src: "/products/flymehere/shot-2.png",
+          alt: "FlyMeHere's two search modes side by side — a conversational agent and a sortable flight list",
+        },
+      ],
+      stack: [
+        "Next.js 14",
+        "Tailwind CSS",
+        "shadcn/ui",
+        "Claude API",
+        "Vercel AI SDK",
+      ],
+      link: {
+        label: "Read the full post-mortem",
+        href: "/blog/why-i-scrapped-my-flight-search-startup",
+      },
     },
   },
 ];

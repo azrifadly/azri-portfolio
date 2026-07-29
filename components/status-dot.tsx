@@ -24,18 +24,24 @@ const STATUS_STYLES: Record<
     pill: "bg-[#F1F1EF] text-[#767672]",
     dot: "bg-[#9B9B96]",
   },
-  decommissioned: {
-    label: "Decommissioned",
-    pill: "bg-[#F3EDED] text-[#8A6A6A]",
-    dot: "bg-[#B48F8F]",
+  // Cool slate, one step deeper than "soon" so the two stay distinguishable.
+  // Deliberately not red: these are end-of-life states, not failures, and
+  // every product currently carries this badge.
+  discontinued: {
+    label: "Discontinued",
+    pill: "bg-[#ECEDF1] text-[#5F6673]",
+    dot: "bg-[#8B93A2]",
   },
 };
 
 export function StatusDot({
   status,
+  note,
   className,
 }: {
   status: ProductStatus;
+  /** Optional qualifier shown after the label, e.g. "Jul 2026". */
+  note?: string;
   className?: string;
 }) {
   const s = STATUS_STYLES[status];
@@ -48,7 +54,7 @@ export function StatusDot({
       )}
     >
       <span className={cn("size-1.5 shrink-0 rounded-full", s.dot)} />
-      {s.label}
+      {note ? `${s.label} · ${note}` : s.label}
     </span>
   );
 }

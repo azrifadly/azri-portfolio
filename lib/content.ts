@@ -65,10 +65,13 @@ export interface TechGroup {
 }
 
 export const techGroups: TechGroup[] = [
-  { label: "Building with AI", items: ["OpenAI", "Claude", "Cursor"] },
+  {
+    label: "Building with AI",
+    items: ["OpenAI", "Claude", "Vercel AI SDK", "Cursor"],
+  },
   {
     label: "Core stack",
-    items: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
+    items: ["Next.js", "React", "TypeScript", "Tailwind CSS", "shadcn/ui"],
   },
   {
     label: "Infrastructure",
@@ -76,4 +79,4 @@ export const techGroups: TechGroup[] = [
   },
 ];
 
-export type BlogCover = "ai" | "automation" | "career";
+export type BlogCover = "ai" | "automation" | "career" | "startup";

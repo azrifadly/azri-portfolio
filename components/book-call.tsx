@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,7 @@ const SLOTS = [
 ];
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_NAME = 80;
 const MAX_MESSAGE = 180;
 
 // --- Anti-spam: front-end guardrail, backed by localStorage ---
@@ -123,8 +125,10 @@ export function BookCall() {
   );
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [nameError, setNameError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -302,6 +306,16 @@ export function BookCall() {
 
   async function confirm() {
     if (!selectedDate || !selectedTime || submitting) return;
+    const nm = name.trim();
+    if (!nm) {
+      setNameError("Please enter your name.");
+      return;
+    }
+    if (nm.length > MAX_NAME) {
+      setNameError(`Please keep your name under ${MAX_NAME} characters.`);
+      return;
+    }
+    setNameError(null);
     const em = email.trim().toLowerCase();
     if (!EMAIL_RE.test(em)) {
       setEmailError("Please enter a valid email.");
@@ -344,6 +358,7 @@ export function BookCall() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          name: nm,
           email: em,
           date: selectedDate,
           time: selectedTime,
@@ -597,6 +612,39 @@ export function BookCall() {
                           >
                             <div className="mt-4">
                               <label
+                                htmlFor="dcw-name"
+                                className="mb-1.5 block text-xs font-medium text-muted-foreground/70"
+                              >
+                                Your name
+                              </label>
+                              <input
+                                id="dcw-name"
+                                type="text"
+                                autoComplete="name"
+                                maxLength={MAX_NAME}
+                                placeholder="Jane Tan"
+                                value={name}
+                                onChange={(e) => {
+                                  setName(e.target.value);
+                                  if (nameError) setNameError(null);
+                                  if (notice) setNotice(null);
+                                }}
+                                aria-invalid={nameError ? true : undefined}
+                                aria-describedby={nameError ? "dcw-name-err" : undefined}
+                                className={cn(
+                                  "w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-foreground",
+                                  nameError ? "border-red-500" : "border-border"
+                                )}
+                              />
+                              {nameError && (
+                                <p id="dcw-name-err" className="mt-1 text-xs text-red-500">
+                                  {nameError}
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="mt-3">
+                              <label
                                 htmlFor="dcw-email"
                                 className="mb-1.5 block text-xs font-medium text-muted-foreground/70"
                               >
@@ -685,6 +733,7 @@ export function BookCall() {
                         disabled={
                           !selectedDate ||
                           !selectedTime ||
+                          !name.trim() ||
                           !email.trim() ||
                           !!messageError ||
                           submitting
@@ -693,6 +742,19 @@ export function BookCall() {
                       >
                         {submitting ? "Booking…" : "Confirm booking"}
                       </button>
+
+                      <p className="mt-3 text-[11px] leading-[1.6] text-muted-foreground/70">
+                        By booking, you agree I can use your name, email and
+                        message to reply and arrange the call. Nothing else — see
+                        the{" "}
+                        <Link
+                          href="/privacy"
+                          className="underline underline-offset-2 transition-colors hover:text-foreground"
+                        >
+                          Privacy Policy
+                        </Link>
+                        .
+                      </p>
                     </>
                   )}
                 </motion.div>

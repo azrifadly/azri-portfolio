@@ -4,9 +4,11 @@ export const runtime = "nodejs";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CALL_MINUTES = 30;
+const MAX_NAME = 80;
 const MAX_MESSAGE = 180;
 
 interface BookBody {
+  name?: string;
   email?: string;
   date?: string;
   time?: string;
@@ -79,12 +81,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
+  const name = (body.name || "").trim();
   const email = (body.email || "").trim().toLowerCase();
   const message = (body.message || "").trim();
   const { date, time, tz, startISO } = body;
 
-  if (!EMAIL_RE.test(email) || !date || !time || !startISO) {
+  if (!name || !EMAIL_RE.test(email) || !date || !time || !startISO) {
     return NextResponse.json({ error: "Missing or invalid booking details." }, { status: 400 });
+  }
+  if (name.length > MAX_NAME) {
+    return NextResponse.json(
+      { error: `Name must be ${MAX_NAME} characters or fewer.` },
+      { status: 400 }
+    );
   }
   if (message.length > MAX_MESSAGE) {
     return NextResponse.json(
@@ -111,19 +120,20 @@ export async function POST(req: Request) {
   const ics = buildICS({
     start,
     end,
-    summary: `Discovery call with ${email}`,
+    summary: `Discovery call with ${name}`,
     description:
-      `Discovery call booked via the website.\nVisitor: ${email}\nRequested slot: ${date} ${time} (${tz || "local"}).` +
+      `Discovery call booked via the website.\nVisitor: ${name} <${email}>\nRequested slot: ${date} ${time} (${tz || "local"}).` +
       (message ? `\nMessage: ${message}` : ""),
   });
 
+  const safeName = escapeHTML(name);
   const safeEmail = escapeHTML(email);
   const safeTz = tz ? escapeHTML(tz) : "";
   const html = `
     <div style="font-family:system-ui,sans-serif;font-size:15px;color:#111">
       <h2 style="margin:0 0 12px">New discovery call booked</h2>
       <p style="margin:0 0 6px"><strong>When:</strong> ${escapeHTML(whenLabel)} ${safeTz ? `(${safeTz})` : ""}</p>
-      <p style="margin:0 0 6px"><strong>With:</strong> ${safeEmail}</p>
+      <p style="margin:0 0 6px"><strong>With:</strong> ${safeName} &lt;${safeEmail}&gt;</p>
       <p style="margin:0 0 6px"><strong>Duration:</strong> ${CALL_MINUTES} min</p>
       ${message ? `<p style="margin:0 0 6px"><strong>Message:</strong> ${escapeHTML(message)}</p>` : ""}
       <p style="margin:16px 0 0;color:#666">Open the attached <code>.ics</code> to add it to your calendar. Reply to this email to reach the visitor.</p>

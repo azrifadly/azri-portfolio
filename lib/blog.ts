@@ -31,6 +31,66 @@ export interface BlogPost {
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: "the-idea-graveyard",
+    topic: "Building",
+    title: "The Idea Graveyard: On Building, Burning Out, and Coming Back",
+    description:
+      "The hardest part of building isn't the building. It's the ideation spiral, the comparison, and knowing when to close the laptop and come back.",
+    date: "2026-08-03",
+    cover: "career",
+    coverImage: {
+      src: "/blog/walking-away-treelined-path.jpg",
+      alt: "A person walking alone down a sunlit, tree-lined path",
+    },
+    keywords: [
+      "indie hacking",
+      "founder burnout",
+      "building in public",
+      "solo founder",
+      "idea validation",
+      "AI and software",
+    ],
+    published: true,
+    body: [
+      {
+        type: "p",
+        text: "Lately the hardest part of building isn't the building. It's figuring out what to build.",
+      },
+      {
+        type: "p",
+        text: "I'll sit down ready to start something new, and within minutes I hit the same wall. Every idea I come up with feels like it's already being built somewhere else, faster and better, with AI doing the heavy lifting. What used to take a small team months now gets spun up by one person over a weekend. So the question stopped being \"is this a good idea?\" It became \"will this even matter by the time I ship it?\"",
+      },
+      {
+        type: "p",
+        text: "That question spirals fast. I get stuck in a loop of what if, what could've, what should've, replaying decisions I haven't even made yet. Should I have picked a different niche? Should I pivot before I've started? It's exhausting, living three steps ahead of a project that doesn't exist.",
+      },
+      {
+        type: "p",
+        text: "Then there's distribution. Even if I build something solid, I know other people will get it in front of more eyes than I ever will. Bigger audiences, more resources, more experience. So part of me wonders whether building is worth it at all when the odds are stacked before I start.",
+      },
+      {
+        type: "p",
+        text: "I've thought about building in public as a way around that. Let people follow the journey, grow an audience alongside the product. But it comes with its own baggage: half-baked ideas out too early, the pressure to perform progress instead of actually making any, and the chance that someone takes the idea and ships it faster than I can.",
+      },
+      {
+        type: "p",
+        text: "By the time I've cycled through all of it, I'm just tired. The ideation, the doubt, the comparison, the endless should-I-build-in-public. Not tired of building. Tired of thinking about building.",
+      },
+      {
+        type: "p",
+        text: "That's usually the sign it's time to stop. Close the laptop, touch some grass, let my brain reset. Not as an excuse, but as an actual part of the process. Overthinking doesn't get fixed by more thinking. It gets fixed by stepping away.",
+      },
+      {
+        type: "p",
+        text: "Because I know from experience, I always come back stronger. Clearer head, shorter list, and most importantly, actual goals for what to build next. Not vague excitement. Direction.",
+      },
+      {
+        type: "quote",
+        text: "The idea graveyard isn't the end of the story. It's just compost for whatever grows next.",
+      },
+    ],
+  },
+  {
     slug: "why-i-scrapped-my-flight-search-startup",
     topic: "Startups",
     title:

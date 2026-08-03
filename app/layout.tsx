@@ -26,7 +26,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: "AzriFadli — Building AI software",
+  title: "AzriFadli — AI Automation & Software Engineer",
   description:
     "I'm Azri. By day I work in Identity and Access Management. Outside work I build AI products, SaaS applications and automations that solve real business problems.",
 };

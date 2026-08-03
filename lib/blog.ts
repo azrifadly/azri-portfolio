@@ -361,24 +361,6 @@ export const blogPosts: BlogPost[] = [
       },
     ],
   },
-  {
-    slug: "production-ready-ai-features",
-    topic: "Artificial intelligence",
-    title:
-      "Making AI Product Development Production-Ready: Lessons From Shipping Real Features",
-    description:
-      "The gap between an AI demo and a production-ready workflow is mostly unglamorous engineering. Here's what actually breaks when real users show up.",
-    date: "2026-07-25",
-    cover: "ai",
-    keywords: [
-      "AI product development",
-      "production-ready workflows",
-      "LLM in production",
-      "AI engineering",
-    ],
-    published: false,
-    body: [],
-  },
 ];
 
 export function getPost(slug: string): BlogPost | undefined {

@@ -143,6 +143,7 @@ export function BookCall() {
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const keyboardNav = useRef(false);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- standard SSR-safe mount flag, needed to defer the portal to the client.
   useEffect(() => setMounted(true), []);
 
   const messageError =
@@ -217,6 +218,7 @@ export function BookCall() {
   useEffect(() => {
     if (!open) return;
     const recent = loadBookings().find((b) => Date.now() - b.ts < COOLDOWN_MS);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reads localStorage (external system) when the dialog opens; blockedMsg is also set imperatively in confirm(), so it isn't pure derived state.
     setBlockedMsg(
       recent && !done
         ? `You already have a call booked for ${prettyDate(recent.date)} at ${recent.time}. I'll be in touch — email me if you need to reschedule.`

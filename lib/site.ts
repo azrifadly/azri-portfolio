@@ -10,6 +10,7 @@ export const site = {
 
 export const navLinks = [
   { label: "Products", href: "/#products" },
+  { label: "Automations", href: "/#automations" },
   { label: "Services", href: "/#services" },
   { label: "About", href: "/#about" },
   { label: "Journey", href: "/#journey" },
@@ -18,6 +19,7 @@ export const navLinks = [
 
 export const footerLinks = [
   { label: "Products", href: "/#products" },
+  { label: "Automations", href: "/#automations" },
   { label: "About", href: "/#about" },
   { label: "Blog", href: "/#blog" },
   { label: "Contact", href: "/#contact" },

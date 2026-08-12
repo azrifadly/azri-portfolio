@@ -348,15 +348,10 @@ export function BookCall() {
       ts: Date.now(),
     };
 
-    // Build an unambiguous absolute start time from the visitor's local pick.
-    const [hh, mm] = selectedTime.split(":").map(Number);
-    const [yr, mo, dy] = selectedDate.split("-").map(Number);
-    const startISO = new Date(yr, mo - 1, dy, hh, mm).toISOString();
-
     setSubmitting(true);
     setNotice(null);
     try {
-      const res = await fetch("/api/book", {
+      const res = await fetch("https://azrifadly.app.n8n.cloud/webhook/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -365,8 +360,6 @@ export function BookCall() {
           date: selectedDate,
           time: selectedTime,
           message: message.trim(),
-          tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          startISO,
         }),
       });
       if (!res.ok) {
